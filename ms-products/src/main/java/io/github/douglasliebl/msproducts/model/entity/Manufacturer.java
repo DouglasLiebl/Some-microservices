@@ -27,7 +27,4 @@ public class Manufacturer {
     @JsonBackReference
     private Set<Product> product;
 
-    @OneToMany(mappedBy = "id", fetch = FetchType.LAZY)
-    @JsonBackReference
-    private Set<Address> addresses;
 }
