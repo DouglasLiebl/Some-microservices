@@ -1,6 +1,8 @@
 package io.github.douglasliebl.msproducts.services.impl;
 
+import ch.qos.logback.core.sift.AppenderFactoryUsingSiftModel;
 import io.github.douglasliebl.msproducts.dto.ProductInsertDTO;
+import io.github.douglasliebl.msproducts.dto.ProductUpdateDTO;
 import io.github.douglasliebl.msproducts.exceptions.ResourceNotFoundException;
 import io.github.douglasliebl.msproducts.model.entity.Category;
 import io.github.douglasliebl.msproducts.model.entity.Product;
@@ -10,11 +12,9 @@ import io.github.douglasliebl.msproducts.model.repositories.ProductRepository;
 import io.github.douglasliebl.msproducts.services.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -40,6 +40,24 @@ public class ProductServiceImpl implements ProductService {
         product.setCategories(new HashSet<>(categories));
 
         return productRepository.save(product);
+    }
+
+    @Override
+    public Product update(Product actualProduct, ProductUpdateDTO updateData) {
+        if (actualProduct.getId() == null || updateData ==  null)
+            throw new IllegalArgumentException("Update data or actual book cannot be null.");
+
+        actualProduct.setName(updateData.getName());
+        actualProduct.setDescription(updateData.getDescription());
+        actualProduct.setPrice(updateData.getPrice());
+
+        return productRepository.save(actualProduct);
+    }
+
+    @Override
+    public Optional<Product> getById(Long id) {
+        return Optional.of(productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id)));
     }
 
     private void manufacturerVerify(Long id) {
