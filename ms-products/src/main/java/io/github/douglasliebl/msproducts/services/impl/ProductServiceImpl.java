@@ -1,18 +1,21 @@
 package io.github.douglasliebl.msproducts.services.impl;
 
-import ch.qos.logback.core.sift.AppenderFactoryUsingSiftModel;
 import io.github.douglasliebl.msproducts.dto.ProductInsertDTO;
 import io.github.douglasliebl.msproducts.dto.ProductUpdateDTO;
 import io.github.douglasliebl.msproducts.exceptions.ResourceNotFoundException;
 import io.github.douglasliebl.msproducts.model.entity.Category;
+import io.github.douglasliebl.msproducts.model.entity.Manufacturer;
 import io.github.douglasliebl.msproducts.model.entity.Product;
 import io.github.douglasliebl.msproducts.model.repositories.CategoryRepository;
 import io.github.douglasliebl.msproducts.model.repositories.ManufacturerRepository;
 import io.github.douglasliebl.msproducts.model.repositories.ProductRepository;
 import io.github.douglasliebl.msproducts.services.ProductService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 
@@ -58,6 +61,30 @@ public class ProductServiceImpl implements ProductService {
     public Optional<Product> getById(Long id) {
         return Optional.of(productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id)));
+    }
+
+    @Override
+    public void delete(Product product) {
+        if (product == null || product.getId() == null) throw new IllegalArgumentException("Product id cannot be null");
+
+        productRepository.delete(product);
+    }
+
+    @Override
+    public Page<Product> find(String name, Pageable pageRequest) {
+        Example<Product> example = Example.of(Product.builder().name(name).build(),
+                ExampleMatcher
+                        .matching()
+                        .withIgnoreCase()
+                        .withIgnoreNullValues()
+                        .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING));
+
+        return productRepository.findAll(example, pageRequest);
+    }
+
+    @Override
+    public Page<Product> findByManufacturer(Manufacturer manufacturer, Pageable pageRequest) {
+        return productRepository.findByManufacturer(manufacturer, pageRequest);
     }
 
     private void manufacturerVerify(Long id) {
