@@ -2,15 +2,12 @@ package io.github.douglasliebl.msproducts.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.HashSet;
 import java.util.Set;
 
-@Getter @Setter
+@Getter @Setter @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity

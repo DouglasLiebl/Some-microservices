@@ -48,7 +48,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Product update(Product actualProduct, ProductUpdateDTO updateData) {
         if (actualProduct.getId() == null || updateData ==  null)
-            throw new IllegalArgumentException("Update data or actual book cannot be null.");
+            throw new IllegalArgumentException("Update data or actual product cannot be null.");
 
         actualProduct.setName(updateData.getName());
         actualProduct.setDescription(updateData.getDescription());
@@ -65,7 +65,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void delete(Product product) {
-        if (product == null || product.getId() == null) throw new IllegalArgumentException("Product id cannot be null");
+        if (product == null || product.getId() == null) throw new IllegalArgumentException("Product cannot be null");
 
         productRepository.delete(product);
     }
