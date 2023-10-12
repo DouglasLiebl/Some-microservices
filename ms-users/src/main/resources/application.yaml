@@ -1,12 +1,15 @@
 spring:
   application:
-    name: auth-server
+    name: ms-users
 
   jpa:
     database: POSTGRESQL
     show-sql: true
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
+    properties:
+      hibernate.jdbc.lab.non_contextual_creation: true
+    generate-ddl: true
 
   datasource:
     url: jdbc:postgresql://localhost:5432/postgres
@@ -18,21 +21,19 @@ spring:
     baseline-on-migrate: true
     enabled: true
 
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080
+          jwk-set-uri: http://localhost:8080/oauth2/jwks
+
 server:
-  port: 8082
+  port: 0
 
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka
   instance:
-    instance-id: 8082
-
-io:
-  auth:
-    provider-uri: "http://localhost:8082"
-    jks:
-      keypass: 123456789
-      storepass: 123456789
-      alias: servicesJks
-      path: keystore/servicesJks.jks
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}

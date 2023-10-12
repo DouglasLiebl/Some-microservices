@@ -6,14 +6,11 @@ import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import io.github.douglasliebl.authserver.model.entity.UserEntity;
 import io.github.douglasliebl.authserver.model.repositories.UserRepository;
-import org.bouncycastle.jcajce.provider.asymmetric.RSA;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.jdbc.core.JdbcOperations;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -25,12 +22,7 @@ import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
-import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationConsentService;
-import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationService;
-import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationConsentService;
-import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
-import org.springframework.security.oauth2.server.authorization.client.JdbcRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
@@ -61,9 +53,10 @@ public class AuthSecurityConfig {
 
     @Bean
     public SecurityFilterChain authFilterChain(HttpSecurity http) throws Exception {
-        return http.authorizeHttpRequests((authorize) ->
-                authorize.anyRequest().authenticated())
-                .formLogin(Customizer.withDefaults()).build();
+        http.authorizeHttpRequests((authorize) ->
+                authorize.anyRequest().authenticated());
+        return http.formLogin(Customizer.withDefaults()).build();
+
     }
 
     @Bean
@@ -82,10 +75,11 @@ public class AuthSecurityConfig {
                     authorities.add(authority.toString());
                 }
 
-                context.getClaims().claim("user_id", userEntity.getId().toString());
-                context.getClaims().claim("first_name", userEntity.getFirstName());
-                context.getClaims().claim("last_name", userEntity.getLastName());
-                context.getClaims().claim("authorities", authorities);
+                context.getClaims().claim("1_user_id", userEntity.getId().toString());
+                context.getClaims().claim("2_first_name", userEntity.getFirstName());
+                context.getClaims().claim("3_last_name", userEntity.getLastName());
+                context.getClaims().claim("4_cpf", userEntity.getCpf());
+                context.getClaims().claim("5_authorities", authorities);
             }
         });
     }
@@ -115,6 +109,7 @@ public class AuthSecurityConfig {
                 .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
                 .redirectUri("http://localhost:3000/authorized")
                 .redirectUri("https://oidcdebugger.com/debug")
+                .redirectUri("https://oauth.pstmn.io/v1/callback")
                 .scope("services:read")
                 .scope("services:write")
                 .tokenSettings(TokenSettings.builder()
@@ -127,23 +122,8 @@ public class AuthSecurityConfig {
                         .build())
                 .build();
 
-
-
         return new InMemoryRegisteredClientRepository(
                 Arrays.asList(servicesUserClient, servicesHighClient));
-    }
-
-
-    @Bean
-    public OAuth2AuthorizationService auth2AuthorizationService(JdbcOperations jdbcOperations,
-                                                                RegisteredClientRepository repository) {
-        return new JdbcOAuth2AuthorizationService(jdbcOperations, repository);
-    }
-
-    @Bean
-    public OAuth2AuthorizationConsentService auth2AuthorizationConsentService(JdbcOperations jdbcOperations,
-                                                                              RegisteredClientRepository repository) {
-        return new JdbcOAuth2AuthorizationConsentService(jdbcOperations, repository);
     }
 
     @Bean

@@ -1,4 +1,4 @@
-package io.github.douglasliebl.authserver.model.entity;
+package io.github.douglasliebl.msusers.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -11,10 +11,10 @@ import java.time.OffsetDateTime;
 @NoArgsConstructor
 @Entity
 @Table(name = "tb_users")
-public class UserEntity {
+public class User {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String firstName;
@@ -22,9 +22,9 @@ public class UserEntity {
 
     @Column(unique = true)
     private String cpf;
-
     @Column(unique = true)
     private String email;
+
     private String password;
 
     @Enumerated(EnumType.STRING)
