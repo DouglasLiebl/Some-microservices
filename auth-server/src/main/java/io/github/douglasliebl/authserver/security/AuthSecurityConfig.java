@@ -75,11 +75,11 @@ public class AuthSecurityConfig {
                     authorities.add(authority.toString());
                 }
 
-                context.getClaims().claim("1_user_id", userEntity.getId().toString());
-                context.getClaims().claim("2_first_name", userEntity.getFirstName());
-                context.getClaims().claim("3_last_name", userEntity.getLastName());
-                context.getClaims().claim("4_cpf", userEntity.getCpf());
-                context.getClaims().claim("5_authorities", authorities);
+                context.getClaims().claim("user_id", userEntity.getId().toString());
+                context.getClaims().claim("first_name", userEntity.getFirstName());
+                context.getClaims().claim("last_name", userEntity.getLastName());
+                context.getClaims().claim("cpf", userEntity.getCpf());
+                context.getClaims().claim("authorities", authorities);
             }
         });
     }
