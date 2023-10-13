@@ -27,7 +27,7 @@ public class UserDTO {
                 .lastName(user.get().getLastName())
                 .cpf(user.get().getCpf())
                 .email(user.get().getEmail())
-                .password(user.get().getPassword())
+                .password(String.format("Encrypted password: %s", user.get().getPassword()))
                 .role(user.get().getRole().name())
                 .createdAt(user.get().getCreatedAt())
                 .build();

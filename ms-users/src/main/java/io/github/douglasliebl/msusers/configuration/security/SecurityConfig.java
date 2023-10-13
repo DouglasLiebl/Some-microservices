@@ -1,5 +1,6 @@
 package io.github.douglasliebl.msusers.configuration.security;
 
+import io.github.douglasliebl.msusers.exception.NoPermissionRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -28,7 +29,7 @@ public class SecurityConfig {
                         authorize.anyRequest().permitAll())
                 .oauth2ResourceServer((oauth2) ->
                         oauth2.jwt(jwtConfigurer ->
-                                jwtConfigurer.jwtAuthenticationConverter(jwtAuthenticationConverter())))
+                                jwtConfigurer.jwtAuthenticationConverter(jwtAuthenticationConverter())).accessDeniedHandler(new NoPermissionRequest()))
                 .build();
     }
 
