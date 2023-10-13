@@ -16,7 +16,7 @@ public class GatewayConfig {
                 .route(r -> r.path("/manufacturer/**").uri("lb://ms-products"))
                 .route(r -> r.path("/category/**").uri("lb://ms-products"))
                 .route(r -> r.path("/oauth2/**").uri("lb://auth-server"))
-                .route(r -> r.path("/users/**").uri("lb://ms-users"))
+                .route(r -> r.path("/user/**").uri("lb://ms-users"))
                 .build();
     }
 }

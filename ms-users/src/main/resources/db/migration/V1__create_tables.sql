@@ -7,4 +7,4 @@ CREATE TABLE tb_users(
     created_at TIMESTAMP(6) NOT NULL,
     password VARCHAR(300) NOT NULL,
     role VARCHAR(6) NOT NULL
-);
+                     );
