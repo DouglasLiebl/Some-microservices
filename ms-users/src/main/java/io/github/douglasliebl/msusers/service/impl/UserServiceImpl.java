@@ -24,7 +24,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDTO save(UserInsertDTO request) {
-        uniquenessChecker(request);
+        uniquenessChecker(request.getCpf(), request.getEmail());
 
         return UserResponseDTO.of(repository
                 .save(User.of(request, passwordEncoder)));
@@ -37,15 +37,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String updateMyUser(Jwt jwt, UserUpdateDTO data) {
+    public UserResponseDTO updateMyUser(Jwt jwt, UserUpdateDTO data) {
         var user = getUser(jwt);
 
         user.setFirstName(data.getFirstName());
         user.setLastName(data.getLastName());
         user.setEmail(data.getEmail());
-        repository.save(user);
 
-        return "User information successfully updated!.";
+        uniquenessChecker(user.getCpf(), user.getEmail());
+
+        return UserResponseDTO.of(repository.save(user));
     }
 
     @Override
@@ -56,13 +57,32 @@ public class UserServiceImpl implements UserService {
                 .encode(data.getPassword()));
         repository.save(user);
 
-        return "Password successfully updated!.";
+        return "Password successfully updated.";
     }
 
     @Override
     public Page<User> find(Pageable pageRequest) {
-
         return repository.findAll(pageRequest);
+    }
+
+    @Override
+    public String delete(Jwt jwt) {
+        var user = getUser(jwt);
+        repository.delete(user);
+
+        return "You account was successfully deleted.";
+    }
+
+    @Override
+    public void banUser(String email) {
+        repository.delete(repository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Account not found.")));
+    }
+
+    @Override
+    public UserDTO getDetailsByEmail(String email) {
+        return UserDTO.of(Optional.of(repository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Account not found."))));
     }
 
     private User getUser(Jwt jwt) {
@@ -71,9 +91,9 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
     }
 
-    private void uniquenessChecker(UserInsertDTO request) {
-        if (repository.existsByCpf(request.getCpf())) throw new DataIntegrityViolationException("CPF already registered.");
-        if (repository.existsByEmail(request.getEmail())) throw new DataIntegrityViolationException("Email already in use.");
+    private void uniquenessChecker(String cpf, String email) {
+        if (repository.existsByCpf(cpf)) throw new DataIntegrityViolationException("CPF already registered.");
+        if (repository.existsByEmail(email)) throw new DataIntegrityViolationException("Email already in use.");
     }
 
 }

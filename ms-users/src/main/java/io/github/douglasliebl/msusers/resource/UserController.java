@@ -1,5 +1,6 @@
 package io.github.douglasliebl.msusers.resource;
 
+import io.github.douglasliebl.msusers.configuration.security.anotations.CanBanAnUser;
 import io.github.douglasliebl.msusers.configuration.security.anotations.CanListAllUsers;
 import io.github.douglasliebl.msusers.configuration.security.anotations.CanReadMyUser;
 import io.github.douglasliebl.msusers.configuration.security.anotations.CanWriteMyUser;
@@ -44,7 +45,7 @@ public class UserController {
     public ResponseEntity updateMyUser(@AuthenticationPrincipal Jwt jwt,
                                        @RequestBody UserUpdateDTO updateData) {
         var response = service.updateMyUser(jwt, updateData);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @CanWriteMyUser
@@ -52,7 +53,7 @@ public class UserController {
     public ResponseEntity updateMyPassword(@AuthenticationPrincipal Jwt jwt,
                                            @RequestBody UserPasswordUpdateDTO newPassword) {
         var response = service.updateMyPassword(jwt, newPassword);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @CanListAllUsers
@@ -64,6 +65,27 @@ public class UserController {
         PageImpl<UserResponseDTO> pagedResponse = new PageImpl<>(result, pageRequest, result.size());
 
         return ResponseEntity.status(HttpStatus.OK).body(pagedResponse);
+    }
+
+    @CanWriteMyUser
+    @DeleteMapping("/delete")
+    public ResponseEntity deleteMyUser(@AuthenticationPrincipal Jwt jwt) {
+        var response = service.delete(jwt);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @CanBanAnUser
+    @DeleteMapping("/delete/{email}")
+    public ResponseEntity banAnUser(@PathVariable String email) {
+        service.banUser(email);
+        return ResponseEntity.noContent().build();
+    }
+
+    @CanListAllUsers
+    @GetMapping("/{email}")
+    public ResponseEntity getUserDetailsForAdmin(@PathVariable String email) {
+        var response = service.getDetailsByEmail(email);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
 }

@@ -12,9 +12,15 @@ public interface UserService {
 
     UserDTO me(Jwt jwt);
 
-    String updateMyUser(Jwt jwt, UserUpdateDTO data);
+    UserResponseDTO updateMyUser(Jwt jwt, UserUpdateDTO data);
 
     String updateMyPassword(Jwt jwt, UserPasswordUpdateDTO data);
 
     Page<User> find(Pageable pageRequest);
+
+    String delete(Jwt jwt);
+
+    void banUser(String email);
+
+    UserDTO getDetailsByEmail(String email);
 }
