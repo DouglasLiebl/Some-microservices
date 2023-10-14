@@ -419,7 +419,6 @@ class UserControllerTest {
                 .andExpect(jsonPath("status").value(HttpStatus.NOT_FOUND.value()))
                 .andExpect(jsonPath("error").value(response))
                 .andExpect(jsonPath("path").value("/user/" + email));
-
     }
 
     private static UserResponseDTO getUserResponseDTO() {
