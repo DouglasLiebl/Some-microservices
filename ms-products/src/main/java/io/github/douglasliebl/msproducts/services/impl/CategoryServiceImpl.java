@@ -22,36 +22,42 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository repository;
 
     @Override
-    public Category registerCategory(Category request) {
+    public CategoryDTO registerCategory(CategoryDTO request) {
         if (repository.existsByName(request.getName())) throw new DataIntegrityViolationException("Category name already registered.");
-        return repository.save(request);
+
+        return CategoryDTO.of(repository
+                .save(Category.of(request)));
     }
 
     @Override
-    public Optional<Category> getById(Long id) {
-        return Optional.of(repository.findById(id)
+    public CategoryDTO getById(Long id) {
+        return CategoryDTO.of(repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id)));
     }
 
     @Override
-    public Category update(Category actualCategory, CategoryDTO request) {
-        if (repository.existsByName(request.getName()) || actualCategory.getId() == null || request.getName() == null)
-            throw new IllegalArgumentException("Update data or actual category cannot be null or equal to an already" +
-                    " registered category.");
+    public CategoryDTO update(Long id, CategoryDTO request) {
+        if (request == null)
+            throw new IllegalArgumentException("Update data cannot be null.");
 
-        actualCategory.setName(request.getName());
-        return repository.save(actualCategory);
+        Category category = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
+        category.setName(request.getName());
+
+        return CategoryDTO.of(repository.save(category));
     }
 
     @Override
-    public void delete(Category category) {
-        if (category == null || category.getId() == null) throw new IllegalArgumentException("Category cannot be null");
-        repository.delete(category);
+    public String delete(Long id) {
+        repository.delete(repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id)));
+
+        return "Category successfully deleted.";
     }
 
     @Override
     public Page<Category> find(String name, Pageable pageRequest) {
-        Example example = Example.of(Category.builder().name(name).build(),
+        Example<Category> example = Example.of(Category.builder().name(name).build(),
                 ExampleMatcher
                         .matching()
                         .withIgnoreCase()

@@ -1,6 +1,7 @@
 package io.github.douglasliebl.msproducts.services.impl;
 
 import io.github.douglasliebl.msproducts.dto.ManufacturerDTO;
+import io.github.douglasliebl.msproducts.exceptions.ResourceNotFoundException;
 import io.github.douglasliebl.msproducts.model.entity.Manufacturer;
 import io.github.douglasliebl.msproducts.model.repositories.ManufacturerRepository;
 import io.github.douglasliebl.msproducts.services.ManufacturerService;
@@ -18,22 +19,27 @@ public class ManufacturerServiceImpl implements ManufacturerService {
     private final ManufacturerRepository repository;
 
     @Override
-    public Manufacturer registerManufacturer(Manufacturer request) {
+    public ManufacturerDTO registerManufacturer(ManufacturerDTO request) {
         uniqueVerifier(request);
-        return repository.save(request);
+        return ManufacturerDTO.of(repository
+                .save(Manufacturer.of(request)));
     }
 
     @Override
-    public Optional<Manufacturer> getManufacturerById(Long id) {
-        return repository.findById(id);
+    public ManufacturerDTO getManufacturerById(Long id) {
+        return ManufacturerDTO.of(repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Manufacturer not found with id: " + id)));
     }
 
     @Override
-    public void delete(Manufacturer request) {
-        repository.delete(request);
+    public String delete(Long id) {
+        repository.delete(repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Manufacturer not found with id: " + id)));
+
+        return "Manufacturer successfully deleted.";
     }
 
-    private void uniqueVerifier(Manufacturer request) {
+    private void uniqueVerifier(ManufacturerDTO request) {
         if (repository.existsByName(request.getName())) throw new DataIntegrityViolationException("Manufacturer name already used.");
         if (repository.existsByCnpj(request.getCnpj())) throw new DataIntegrityViolationException("CNPJ already registered.");
         if (repository.existsByEmail(request.getEmail())) throw new DataIntegrityViolationException("Email already registered.");

@@ -9,13 +9,13 @@ import java.util.Optional;
 
 public interface CategoryService {
 
-    Category registerCategory(Category request);
+    CategoryDTO registerCategory(CategoryDTO request);
 
-    Optional<Category> getById(Long id);
+    CategoryDTO getById(Long id);
 
-    Category update(Category actualCategory, CategoryDTO request);
+    CategoryDTO update(Long id, CategoryDTO request);
 
-    void delete(Category category);
+    String delete(Long id);
 
     Page<Category> find(String name, Pageable pageRequest);
 }

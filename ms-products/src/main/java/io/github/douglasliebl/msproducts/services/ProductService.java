@@ -8,17 +8,15 @@ import io.github.douglasliebl.msproducts.model.entity.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.Optional;
-
 public interface ProductService {
 
-    Product createProduct(ProductInsertDTO request);
+    ProductDTO createProduct(ProductInsertDTO request);
 
-    Optional<Product> getById(Long id);
+    ProductDTO getById(Long id);
 
-    Product update(Product actualProduct, ProductUpdateDTO updateData);
+    ProductDTO update(Long id, ProductUpdateDTO updateData);
 
-    void delete(Product product);
+    String delete(Long id);
 
     Page<Product> find(String name, Pageable pageRequest);
 

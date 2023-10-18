@@ -1,6 +1,7 @@
 package io.github.douglasliebl.msproducts.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import io.github.douglasliebl.msproducts.dto.ProductUpdateDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -35,4 +36,15 @@ public class Product {
             inverseJoinColumns = @JoinColumn(name = "category_id"))
     private Set<Category> categories = new HashSet<>();
 
+
+    public static Product of(Product actual, ProductUpdateDTO productUpdate) {
+        return Product.builder()
+                .id(actual.getId())
+                .name(productUpdate.getName())
+                .description(productUpdate.getDescription())
+                .price(productUpdate.getPrice())
+                .manufacturer(actual.getManufacturer())
+                .categories(actual.getCategories())
+                .build();
+    }
 }

@@ -12,10 +12,6 @@ import javax.management.modelmbean.ModelMBean;
 @EnableDiscoveryClient
 public class MsProductsApplication {
 
-	@Bean
-	public ModelMapper modelMapper() {
-		return new ModelMapper();
-	}
 	public static void main(String[] args) {
 		SpringApplication.run(MsProductsApplication.class, args);
 	}

@@ -1,9 +1,9 @@
 package io.github.douglasliebl.msproducts.services.impl;
 
+import io.github.douglasliebl.msproducts.dto.ProductDTO;
 import io.github.douglasliebl.msproducts.dto.ProductInsertDTO;
 import io.github.douglasliebl.msproducts.dto.ProductUpdateDTO;
 import io.github.douglasliebl.msproducts.exceptions.ResourceNotFoundException;
-import io.github.douglasliebl.msproducts.model.entity.Category;
 import io.github.douglasliebl.msproducts.model.entity.Manufacturer;
 import io.github.douglasliebl.msproducts.model.entity.Product;
 import io.github.douglasliebl.msproducts.model.repositories.CategoryRepository;
@@ -17,7 +17,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -28,46 +31,44 @@ public class ProductServiceImpl implements ProductService {
     private final ManufacturerRepository manufacturerRepository;
 
     @Override
-    public Product createProduct(ProductInsertDTO request) {
+    public ProductDTO createProduct(ProductInsertDTO request) {
         manufacturerVerify(request.getManufacturerId());
         categoryVerify(request.getCategories());
 
-        Product product = new Product();
-        product.setName(request.getName());
-        product.setDescription(request.getDescription());
-        product.setPrice(request.getPrice());
-        product.setManufacturer(manufacturerRepository.findById(request.getManufacturerId())
-                .orElseThrow());
+        Product product = Product.builder()
+                .name(request.getName())
+                .description(request.getDescription())
+                .price(request.getPrice())
+                .manufacturer(manufacturerRepository.findById(request.getManufacturerId())
+                        .orElseThrow())
+                .categories(new HashSet<>(categoryRepository.findAllById(request.getCategories())))
+                .build();
 
-        List<Category> categories = categoryRepository.findAllById(request.getCategories());
-        product.setCategories(new HashSet<>(categories));
-
-        return productRepository.save(product);
+        return ProductDTO.of(productRepository.save(product));
     }
 
     @Override
-    public Product update(Product actualProduct, ProductUpdateDTO updateData) {
-        if (actualProduct.getId() == null || updateData ==  null)
-            throw new IllegalArgumentException("Update data or actual product cannot be null.");
+    public ProductDTO update(Long id, ProductUpdateDTO updateData) {
+        if (updateData == null)
+            throw new IllegalArgumentException("Update data cannot be null.");
 
-        actualProduct.setName(updateData.getName());
-        actualProduct.setDescription(updateData.getDescription());
-        actualProduct.setPrice(updateData.getPrice());
+        Product actualProduct = getProduct(id);
 
-        return productRepository.save(actualProduct);
+        return ProductDTO.of(productRepository
+                .save(Product.of(actualProduct, updateData)));
     }
 
     @Override
-    public Optional<Product> getById(Long id) {
-        return Optional.of(productRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id)));
+    public ProductDTO getById(Long id) {
+        return ProductDTO.of(getProduct(id));
     }
 
     @Override
-    public void delete(Product product) {
-        if (product == null || product.getId() == null) throw new IllegalArgumentException("Product cannot be null");
-
+    public String delete(Long id) {
+        var product = getProduct(id);
         productRepository.delete(product);
+
+        return "Product successfully deleted.";
     }
 
     @Override
@@ -85,6 +86,11 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Page<Product> findByManufacturer(Manufacturer manufacturer, Pageable pageRequest) {
         return productRepository.findByManufacturer(manufacturer, pageRequest);
+    }
+
+    private Product getProduct(Long id) {
+        return productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
     }
 
     private void manufacturerVerify(Long id) {

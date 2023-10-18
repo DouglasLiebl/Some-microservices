@@ -1,14 +1,15 @@
 package io.github.douglasliebl.msproducts.services;
 
+import io.github.douglasliebl.msproducts.dto.ManufacturerDTO;
 import io.github.douglasliebl.msproducts.model.entity.Manufacturer;
 
 import java.util.Optional;
 
 public interface ManufacturerService {
 
-    Manufacturer registerManufacturer(Manufacturer request);
+    ManufacturerDTO registerManufacturer(ManufacturerDTO request);
 
-    Optional<Manufacturer> getManufacturerById(Long id);
+    ManufacturerDTO getManufacturerById(Long id);
 
-    void delete(Manufacturer manufacturer);
+    String delete(Long id);
 }

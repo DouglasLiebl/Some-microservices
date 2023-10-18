@@ -1,6 +1,7 @@
 package io.github.douglasliebl.msproducts.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import io.github.douglasliebl.msproducts.dto.ManufacturerDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -26,5 +27,24 @@ public class Manufacturer {
     @OneToMany(mappedBy = "manufacturer", fetch = FetchType.LAZY)
     @JsonBackReference
     private Set<Product> product;
+
+    public static Manufacturer of(ManufacturerDTO manufacturerDTO) {
+        return Manufacturer.builder()
+                .name(manufacturerDTO.getName())
+                .cnpj(manufacturerDTO.getCnpj())
+                .email(manufacturerDTO.getEmail())
+                .phoneNumber(manufacturerDTO.getPhoneNumber())
+                .build();
+    }
+
+    public static Manufacturer ofDTO(ManufacturerDTO manufacturerDTO) {
+        return Manufacturer.builder()
+                .id(manufacturerDTO.getId())
+                .name(manufacturerDTO.getName())
+                .cnpj(manufacturerDTO.getCnpj())
+                .email(manufacturerDTO.getEmail())
+                .phoneNumber(manufacturerDTO.getPhoneNumber())
+                .build();
+    }
 
 }

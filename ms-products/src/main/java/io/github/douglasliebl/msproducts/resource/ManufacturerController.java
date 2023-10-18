@@ -1,5 +1,6 @@
 package io.github.douglasliebl.msproducts.resource;
 
+import com.thoughtworks.xstream.io.xml.PrettyPrintWriter;
 import io.github.douglasliebl.msproducts.dto.ManufacturerDTO;
 import io.github.douglasliebl.msproducts.dto.ProductDTO;
 import io.github.douglasliebl.msproducts.model.entity.Manufacturer;
@@ -27,42 +28,37 @@ public class ManufacturerController {
 
     private final ManufacturerService service;
     private final ProductService productService;
-    private final ModelMapper mapper;
 
     @PostMapping
     public ResponseEntity create(@RequestBody ManufacturerDTO request) {
-        var response = mapper.map(service
-                .registerManufacturer(mapper.map(request, Manufacturer.class)), ManufacturerDTO.class);
+        var response = service.registerManufacturer(request);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}").buildAndExpand(response.getId()).toUri();
+
         return ResponseEntity.created(uri).body(response);
     }
 
     @GetMapping(value = "/{id}")
     public ResponseEntity getManufacturerById(@PathVariable Long id) {
-        var response = service.getManufacturerById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        var response = service.getManufacturerById(id);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteManufacturer(@PathVariable Long id) {
-        service.delete(service.getManufacturerById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
+    public ResponseEntity deleteManufacturer(@PathVariable Long id) {
+        var response = service.delete(id);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/{id}/products")
     public ResponseEntity getProductsByManufacturer(@PathVariable Long id, Pageable pageRequest) {
-        var manufacturer = service.getManufacturerById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-
-        Page<Product> result = productService.findByManufacturer(manufacturer, pageRequest);
-        List<ProductDTO> response = result.stream()
-                .map(entity -> mapper.map(entity, ProductDTO.class))
+        List<ProductDTO> response = productService
+                .findByManufacturer(Manufacturer.of(service.getManufacturerById(id)), pageRequest).stream()
+                .map(ProductDTO::of)
                 .toList();
 
-        PageImpl<ProductDTO> pagedResponse = new PageImpl<>(response, pageRequest, result.getTotalElements());
+        PageImpl<ProductDTO> pagedResponse = new PageImpl<>(response, pageRequest, response.size());
 
         return ResponseEntity.status(HttpStatus.OK).body(pagedResponse);
     }

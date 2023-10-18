@@ -17,7 +17,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -30,7 +32,10 @@ public class UserController {
     @PostMapping("/register")
     public ResponseEntity register(@RequestBody UserInsertDTO request) {
         var response = service.save(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        URI uri = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("/user/{email}").buildAndExpand(response.getEmail()).toUri();
+
+        return ResponseEntity.created(uri).body(response);
     }
 
     @CanReadMyUser

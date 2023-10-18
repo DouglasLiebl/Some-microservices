@@ -22,11 +22,10 @@ import java.util.List;
 public class CategoryController {
 
     private final CategoryService service;
-    private final ModelMapper mapper;
 
     @PostMapping
     public ResponseEntity create(@RequestBody CategoryDTO request) {
-        var response = mapper.map(service.registerCategory(mapper.map(request, Category.class)), CategoryDTO.class);
+        var response = service.registerCategory(request);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}").buildAndExpand(response.getId()).toUri();
 
@@ -35,33 +34,29 @@ public class CategoryController {
 
     @PutMapping(value = "/{id}")
     public ResponseEntity update(@PathVariable Long id, @RequestBody CategoryDTO request) {
-        Category actualCategory = service.getById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-
-        var updatedCategory = mapper.map(service.update(actualCategory, request), CategoryDTO.class);
-
-        return ResponseEntity.status(HttpStatus.OK).body(updatedCategory);
+       var response = service.update(id, request);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @DeleteMapping(value = "/{id}")
-    public void deleteCategory(@PathVariable Long id) {
-        service.delete(service.getById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
+    public ResponseEntity deleteCategory(@PathVariable Long id) {
+        var response = service.delete(id);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping(value = "/{id}")
     public ResponseEntity getCategoryById(@PathVariable Long id) {
-         var response = mapper.map(service.getById(id), CategoryDTO.class);
+         var response = service.getById(id);
          return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping
     public ResponseEntity find(String name, Pageable pageRequest) {
-        var result = service.find(name, pageRequest);
-        List<CategoryDTO> response = result.stream()
-                .map(entity -> mapper.map(entity, CategoryDTO.class))
+        List<CategoryDTO> response = service.find(name, pageRequest).stream()
+                .map(CategoryDTO::of)
                 .toList();
-        PageImpl<CategoryDTO> pagedResponse = new PageImpl<>(response, pageRequest, result.getTotalElements());
+
+        PageImpl<CategoryDTO> pagedResponse = new PageImpl<>(response, pageRequest, response.size());
 
         return ResponseEntity.status(HttpStatus.OK).body(pagedResponse);
     }
