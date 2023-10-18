@@ -1,8 +1,10 @@
 package io.github.douglasliebl.msusers.service;
 
+import io.github.douglasliebl.msusers.dto.UserDTO;
 import io.github.douglasliebl.msusers.dto.UserInsertDTO;
 import io.github.douglasliebl.msusers.dto.UserResponseDTO;
 import io.github.douglasliebl.msusers.dto.UserUpdateDTO;
+import io.github.douglasliebl.msusers.exception.ResourceNotFoundException;
 import io.github.douglasliebl.msusers.model.entity.Role;
 import io.github.douglasliebl.msusers.model.entity.User;
 import io.github.douglasliebl.msusers.model.repositories.UserRepository;
@@ -15,13 +17,22 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.OffsetDateTime;
+import java.util.Collections;
+import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
@@ -106,6 +117,103 @@ class UserServiceTest {
                 .hasMessage("Email already in use.");
     }
 
+    @Test
+    @DisplayName("Should get paginated users.")
+    public void getPagedUsersTest() {
+        // given
+        User user = getUser();
+        PageRequest pageRequest = PageRequest.of(0, 10);
+
+        Page<User> page = new PageImpl<>(Collections.singletonList(user), pageRequest, 1);
+
+        // when
+        Mockito.when(repository.findAll(Mockito.any(Pageable.class)))
+                .thenReturn(page);
+
+        // then
+        Page<User> response = service.find(pageRequest);
+
+        assertThat(response.getTotalElements()).isEqualTo(1);
+        assertThat(response.getContent()).isEqualTo(Collections.singletonList(user));
+        assertThat(response.getPageable().getPageNumber()).isEqualTo(page.getNumber());
+        assertThat(response.getPageable().getPageSize()).isEqualTo(page.getSize());
+    }
+
+    @Test
+    @DisplayName("Should successfully ban an user.")
+    public void banUserTest() {
+        // given
+        User user = getUser();
+
+        // when
+        Mockito.when(repository.findByEmail(Mockito.anyString()))
+                        .thenReturn(Optional.ofNullable(user));
+
+        assertDoesNotThrow(() -> service.banUser(getUser().getEmail()));
+
+        // then
+        Mockito.verify(repository, Mockito.times(1)).delete(user);
+    }
+
+    @Test
+    @DisplayName("Should throw an exception when trying ban an user not registered.")
+    public void banUserNotRegisteredTest() {
+        // given
+        User user = getUser();
+
+        // when
+        Mockito.when(repository.findByEmail(Mockito.anyString()))
+                .thenReturn(Optional.empty());
+
+       Throwable exception = Assertions.catchThrowable(() -> service.banUser(getUser().getEmail()));
+
+        // then
+        assertThat(exception)
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage("Account not found.");
+        Mockito.verify(repository, Mockito.never()).delete(user);
+    }
+
+    @Test
+    @DisplayName("Should get user details by email.")
+    public void getUserDetailsByEmailTest() {
+        // given
+        String email = "teste@email.com";
+        User user = getUser();
+
+        // when
+        Mockito.when(repository.findByEmail(Mockito.anyString()))
+                .thenReturn(Optional.ofNullable(user));
+
+        // then
+        UserDTO response = service.getDetailsByEmail(email);
+
+        assertThat(response.getId()).isEqualTo(user.getId());
+        assertThat(response.getEmail()).isEqualTo(user.getEmail());
+        assertThat(response.getFirstName()).isEqualTo(user.getFirstName());
+        assertThat(response.getLastName()).isEqualTo(user.getLastName());
+        assertThat(response.getCpf()).isEqualTo(user.getCpf());
+        assertThat(response.getRole()).isEqualTo(user.getRole().name());
+    }
+
+    @Test
+    @DisplayName("Should throw an exception trying to get an user not registered.")
+    public void getNotRegisteredUserTest() {
+        // given
+        String email = "teste@email.com";
+
+        // when
+        Mockito.when(repository.findByEmail(Mockito.anyString()))
+                .thenReturn(Optional.empty());
+
+        // then
+        Throwable exception = Assertions.catchThrowable(() -> service.getDetailsByEmail(email));
+
+        assertThat(exception)
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage("Account not found.");
+    }
+
     private static User getUser() {
         return User.builder()
                 .id(1L)
@@ -119,16 +227,6 @@ class UserServiceTest {
                 .build();
     }
 
-    private static UserResponseDTO getUserResponseDTO() {
-        return UserResponseDTO.builder()
-                .id(1L)
-                .firstName("teste")
-                .lastName("teste")
-                .email("teste@email.com")
-                .role("CLIENT")
-                .build();
-    }
-
     private static UserInsertDTO getUserInsertDTO() {
         return UserInsertDTO.builder()
                 .firstName("teste")
@@ -136,14 +234,6 @@ class UserServiceTest {
                 .cpf("12345678911")
                 .email("teste@email.com")
                 .password("123456789").build();
-    }
-
-    private static UserUpdateDTO getUserUpdateDTO() {
-        return UserUpdateDTO.builder()
-                .firstName("new")
-                .lastName("new")
-                .email("new@email.com")
-                .build();
     }
 
 }
