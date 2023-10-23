@@ -1,4 +1,4 @@
-package io.github.douglasliebl.msproducts.exceptions;
+package io.github.douglasliebl.msproducts.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

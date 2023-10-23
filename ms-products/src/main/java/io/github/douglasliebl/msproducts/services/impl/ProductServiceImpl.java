@@ -3,7 +3,7 @@ package io.github.douglasliebl.msproducts.services.impl;
 import io.github.douglasliebl.msproducts.dto.ProductDTO;
 import io.github.douglasliebl.msproducts.dto.ProductInsertDTO;
 import io.github.douglasliebl.msproducts.dto.ProductUpdateDTO;
-import io.github.douglasliebl.msproducts.exceptions.ResourceNotFoundException;
+import io.github.douglasliebl.msproducts.exception.ResourceNotFoundException;
 import io.github.douglasliebl.msproducts.model.entity.Manufacturer;
 import io.github.douglasliebl.msproducts.model.entity.Product;
 import io.github.douglasliebl.msproducts.model.repositories.CategoryRepository;

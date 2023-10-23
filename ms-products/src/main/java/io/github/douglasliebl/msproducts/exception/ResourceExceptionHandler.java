@@ -1,13 +1,11 @@
-package io.github.douglasliebl.msproducts.exceptions;
+package io.github.douglasliebl.msproducts.exception;
 
-import jakarta.servlet.ServletSecurityElement;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.context.request.WebRequest;
 
 import java.time.LocalDateTime;
 

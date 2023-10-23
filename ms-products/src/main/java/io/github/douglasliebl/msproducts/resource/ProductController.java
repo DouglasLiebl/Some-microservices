@@ -1,5 +1,6 @@
 package io.github.douglasliebl.msproducts.resource;
 
+import io.github.douglasliebl.msproducts.configuration.security.anotations.AdminPrivileges;
 import io.github.douglasliebl.msproducts.dto.ProductDTO;
 import io.github.douglasliebl.msproducts.dto.ProductInsertDTO;
 import io.github.douglasliebl.msproducts.dto.ProductUpdateDTO;
@@ -22,6 +23,7 @@ public class ProductController {
 
     private final ProductService service;
 
+    @AdminPrivileges
     @PostMapping
     public ResponseEntity createProduct(@RequestBody ProductInsertDTO request) {
         var response = service.createProduct(request);
@@ -31,6 +33,7 @@ public class ProductController {
         return ResponseEntity.created(uri).body(response);
     }
 
+    @AdminPrivileges
     @PutMapping(value = "/{id}")
     public ResponseEntity updateProduct(@PathVariable Long id, @RequestBody ProductUpdateDTO request) {
         var updatedProduct = service.update(id, request);
@@ -43,6 +46,7 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @AdminPrivileges
     @DeleteMapping(value = "/{id}")
     public ResponseEntity deleteProduct(@PathVariable Long id) {
         var response = service.delete(id);

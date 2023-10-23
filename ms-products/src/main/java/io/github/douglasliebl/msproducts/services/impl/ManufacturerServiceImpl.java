@@ -1,7 +1,7 @@
 package io.github.douglasliebl.msproducts.services.impl;
 
 import io.github.douglasliebl.msproducts.dto.ManufacturerDTO;
-import io.github.douglasliebl.msproducts.exceptions.ResourceNotFoundException;
+import io.github.douglasliebl.msproducts.exception.ResourceNotFoundException;
 import io.github.douglasliebl.msproducts.model.entity.Manufacturer;
 import io.github.douglasliebl.msproducts.model.repositories.ManufacturerRepository;
 import io.github.douglasliebl.msproducts.services.ManufacturerService;
@@ -9,8 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

@@ -1,21 +1,17 @@
 package io.github.douglasliebl.msproducts.resource;
 
-import com.thoughtworks.xstream.io.xml.PrettyPrintWriter;
+import io.github.douglasliebl.msproducts.configuration.security.anotations.AdminPrivileges;
 import io.github.douglasliebl.msproducts.dto.ManufacturerDTO;
 import io.github.douglasliebl.msproducts.dto.ProductDTO;
 import io.github.douglasliebl.msproducts.model.entity.Manufacturer;
-import io.github.douglasliebl.msproducts.model.entity.Product;
 import io.github.douglasliebl.msproducts.services.ManufacturerService;
 import io.github.douglasliebl.msproducts.services.ProductService;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
@@ -29,6 +25,7 @@ public class ManufacturerController {
     private final ManufacturerService service;
     private final ProductService productService;
 
+    @AdminPrivileges
     @PostMapping
     public ResponseEntity create(@RequestBody ManufacturerDTO request) {
         var response = service.registerManufacturer(request);
@@ -38,19 +35,21 @@ public class ManufacturerController {
         return ResponseEntity.created(uri).body(response);
     }
 
+    @AdminPrivileges
     @GetMapping(value = "/{id}")
     public ResponseEntity getManufacturerById(@PathVariable Long id) {
         var response = service.getManufacturerById(id);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @AdminPrivileges
     @DeleteMapping(value = "/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity deleteManufacturer(@PathVariable Long id) {
         var response = service.delete(id);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @AdminPrivileges
     @GetMapping("/{id}/products")
     public ResponseEntity getProductsByManufacturer(@PathVariable Long id, Pageable pageRequest) {
         List<ProductDTO> response = productService

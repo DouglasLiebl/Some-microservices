@@ -1,7 +1,7 @@
 package io.github.douglasliebl.msproducts.services.impl;
 
 import io.github.douglasliebl.msproducts.dto.CategoryDTO;
-import io.github.douglasliebl.msproducts.exceptions.ResourceNotFoundException;
+import io.github.douglasliebl.msproducts.exception.ResourceNotFoundException;
 import io.github.douglasliebl.msproducts.model.entity.Category;
 import io.github.douglasliebl.msproducts.model.repositories.CategoryRepository;
 import io.github.douglasliebl.msproducts.services.CategoryService;
@@ -12,8 +12,6 @@ import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

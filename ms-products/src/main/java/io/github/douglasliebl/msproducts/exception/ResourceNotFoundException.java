@@ -1,4 +1,4 @@
-package io.github.douglasliebl.msproducts.exceptions;
+package io.github.douglasliebl.msproducts.exception;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
