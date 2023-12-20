@@ -3,9 +3,10 @@ package io.github.douglasliebl.msproducts.services;
 import io.github.douglasliebl.msproducts.dto.ProductDTO;
 import io.github.douglasliebl.msproducts.dto.ProductInsertDTO;
 import io.github.douglasliebl.msproducts.dto.ProductUpdateDTO;
-import io.github.douglasliebl.msproducts.model.entity.Manufacturer;
+import io.github.douglasliebl.msproducts.model.entity.Category;
 import io.github.douglasliebl.msproducts.model.entity.Product;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 public interface ProductService {
@@ -18,7 +19,10 @@ public interface ProductService {
 
     String delete(Long id);
 
-    Page<Product> find(String name, Pageable pageRequest);
+    PageImpl<ProductDTO> find(String name, Pageable pageRequest);
 
-    Page<Product> findByManufacturer(Manufacturer manufacturer, Pageable pageRequest);
+    Page<Product> findByManufacturer(Long id, Pageable pageRequest);
+
+    Page<Product> findByCategory(Category category, Pageable pageRequest);
+
 }

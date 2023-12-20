@@ -369,58 +369,6 @@ class UserControllerTest {
                 .andExpect(status().isNoContent());
     }
 
-    @Test
-    @DisplayName("Should get an user details by email")
-    public void getUserDetailsByEmailTest() throws Exception {
-        // given
-        UserDTO userDTO = UserDTO.builder()
-                .id(1L)
-                .email("teste@email.com")
-                .role("CLIENT")
-                .build();
-
-        BDDMockito.given(service.getDetailsByEmail(Mockito.anyString()))
-                .willReturn(userDTO);
-
-        // when
-        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
-                .get(USER_URL.concat("/" + userDTO.getEmail()))
-                .accept(MediaType.APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, "Bearer 3iSRPOKdfTG47TxAOr5FWp_BVnVpueBbbUkKLVtB8VVMF9BcA");
-
-        // then
-        mockMvc.perform(requestBuilder)
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("id").value(userDTO.getId()))
-                .andExpect(jsonPath("email").value(userDTO.getEmail()))
-                .andExpect(jsonPath("role").value(userDTO.getRole()));
-    }
-
-    @Test
-    @DisplayName("Should throw an exception when user not found.")
-    public void getExceptionWhenAccountNotFoundTest() throws Exception {
-        // given
-        String email = "teste@email.com";
-        String response = "Account not found.";
-
-        BDDMockito.given(service.getDetailsByEmail(Mockito.anyString()))
-                .willThrow(new ResourceNotFoundException(response));
-
-        // when
-        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
-                .get(USER_URL.concat("/" + email))
-                .accept(MediaType.APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, "Bearer 3iSRPOKdfTG47TxAOr5FWp_BVnVpueBbbUkKLVtB8VVMF9BcA");
-
-        // then
-        mockMvc.perform(requestBuilder)
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("localDateTime").isNotEmpty())
-                .andExpect(jsonPath("status").value(HttpStatus.NOT_FOUND.value()))
-                .andExpect(jsonPath("error").value(response))
-                .andExpect(jsonPath("path").value("/user/" + email));
-    }
-
     private static UserResponseDTO getUserResponseDTO() {
         return UserResponseDTO.builder()
                 .id(1L)

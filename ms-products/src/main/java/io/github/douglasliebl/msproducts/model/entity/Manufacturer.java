@@ -24,7 +24,7 @@ public class Manufacturer {
     private String email;
     private String phoneNumber;
 
-    @OneToMany(mappedBy = "manufacturer", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "manufacturer", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JsonBackReference
     private Set<Product> product;
 

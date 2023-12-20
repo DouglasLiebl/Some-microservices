@@ -1,23 +1,26 @@
 package io.github.douglasliebl.msproducts.services.impl;
 
 import io.github.douglasliebl.msproducts.dto.CategoryDTO;
+import io.github.douglasliebl.msproducts.dto.ProductDTO;
 import io.github.douglasliebl.msproducts.exception.ResourceNotFoundException;
 import io.github.douglasliebl.msproducts.model.entity.Category;
 import io.github.douglasliebl.msproducts.model.repositories.CategoryRepository;
 import io.github.douglasliebl.msproducts.services.CategoryService;
+import io.github.douglasliebl.msproducts.services.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository repository;
+    private final ProductService service;
 
     @Override
     public CategoryDTO registerCategory(CategoryDTO request) {
@@ -25,12 +28,6 @@ public class CategoryServiceImpl implements CategoryService {
 
         return CategoryDTO.of(repository
                 .save(Category.of(request)));
-    }
-
-    @Override
-    public CategoryDTO getById(Long id) {
-        return CategoryDTO.of(repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id)));
     }
 
     @Override
@@ -54,14 +51,22 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public Page<Category> find(String name, Pageable pageRequest) {
-        Example<Category> example = Example.of(Category.builder().name(name).build(),
-                ExampleMatcher
-                        .matching()
-                        .withIgnoreCase()
-                        .withIgnoreNullValues()
-                        .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING));
+    public PageImpl<ProductDTO> getProductsByCategory(Long id, Pageable pageRequest) {
+        List<ProductDTO> response = service.findByCategory(getById(id), pageRequest).stream()
+                .map(ProductDTO::of)
+                .toList();
 
-        return repository.findAll(example, pageRequest);
+        return new PageImpl<>(response, pageRequest, response.size());
+    }
+
+    @Override
+    public List<CategoryDTO> getAllCategories() {
+        return repository.findAll().stream()
+                .map(CategoryDTO::of).toList();
+    }
+
+    private Category getById(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
     }
 }

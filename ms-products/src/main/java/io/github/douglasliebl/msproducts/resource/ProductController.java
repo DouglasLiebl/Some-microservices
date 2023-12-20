@@ -55,12 +55,8 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity find(String name, Pageable pageRequest) {
-        List<ProductDTO> response = service.find(name, pageRequest).stream()
-                .map(ProductDTO::of)
-                .toList();
-        PageImpl<ProductDTO> pagedResponse = new PageImpl<>(response, pageRequest, response.size());
-
-        return ResponseEntity.status(HttpStatus.OK).body(pagedResponse);
+        var response = service.find(name, pageRequest);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
 }

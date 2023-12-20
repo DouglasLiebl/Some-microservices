@@ -80,17 +80,10 @@ public class UserController {
     }
 
     @CanBanAnUser
-    @DeleteMapping("/delete/{email}")
-    public ResponseEntity banAnUser(@PathVariable String email) {
+    @DeleteMapping("/ban")
+    public ResponseEntity banAnUser(@RequestParam String email) {
         service.banUser(email);
         return ResponseEntity.noContent().build();
-    }
-
-    @CanListAllUsers
-    @GetMapping("/{email}")
-    public ResponseEntity getUserDetailsForAdmin(@PathVariable String email) {
-        var response = service.getDetailsByEmail(email);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
 }

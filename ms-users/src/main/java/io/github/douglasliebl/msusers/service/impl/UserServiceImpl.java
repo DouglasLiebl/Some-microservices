@@ -24,7 +24,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDTO save(UserInsertDTO request) {
-        uniquenessChecker(request.getCpf(), request.getEmail());
+        cpfCheck(request.getCpf());
+        emailCheck(request.getEmail());
 
         return UserResponseDTO.of(repository
                 .save(User.of(request, passwordEncoder)));
@@ -44,7 +45,7 @@ public class UserServiceImpl implements UserService {
         user.setLastName(data.getLastName());
         user.setEmail(data.getEmail());
 
-        uniquenessChecker(user.getCpf(), user.getEmail());
+        emailCheck(data.getEmail());
 
         return UserResponseDTO.of(repository.save(user));
     }
@@ -79,21 +80,18 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("Account not found.")));
     }
 
-    @Override
-    public UserDTO getDetailsByEmail(String email) {
-        return UserDTO.of(Optional.of(repository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("Account not found."))));
-    }
-
     private User getUser(Jwt jwt) {
         String email = jwt.getClaims().get("sub").toString();
         return repository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
     }
 
-    private void uniquenessChecker(String cpf, String email) {
-        if (repository.existsByCpf(cpf)) throw new DataIntegrityViolationException("CPF already registered.");
+    private void emailCheck(String email) {
         if (repository.existsByEmail(email)) throw new DataIntegrityViolationException("Email already in use.");
+    }
+
+    private void cpfCheck(String cpf) {
+        if (repository.existsByCpf(cpf)) throw new DataIntegrityViolationException("CPF already registered.");
     }
 
 }

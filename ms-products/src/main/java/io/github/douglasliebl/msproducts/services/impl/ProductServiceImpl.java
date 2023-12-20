@@ -4,17 +4,14 @@ import io.github.douglasliebl.msproducts.dto.ProductDTO;
 import io.github.douglasliebl.msproducts.dto.ProductInsertDTO;
 import io.github.douglasliebl.msproducts.dto.ProductUpdateDTO;
 import io.github.douglasliebl.msproducts.exception.ResourceNotFoundException;
-import io.github.douglasliebl.msproducts.model.entity.Manufacturer;
+import io.github.douglasliebl.msproducts.model.entity.Category;
 import io.github.douglasliebl.msproducts.model.entity.Product;
 import io.github.douglasliebl.msproducts.model.repositories.CategoryRepository;
 import io.github.douglasliebl.msproducts.model.repositories.ManufacturerRepository;
 import io.github.douglasliebl.msproducts.model.repositories.ProductRepository;
 import io.github.douglasliebl.msproducts.services.ProductService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -72,20 +69,26 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Page<Product> find(String name, Pageable pageRequest) {
-        Example<Product> example = Example.of(Product.builder().name(name).build(),
+    public PageImpl<ProductDTO> find(String name, Pageable pageRequest) {
+        List<ProductDTO> response = productRepository.findAll(Example.of(Product.builder().name(name).build(),
                 ExampleMatcher
                         .matching()
                         .withIgnoreCase()
                         .withIgnoreNullValues()
-                        .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING));
+                        .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING)), pageRequest).stream()
+                .map(ProductDTO::of).toList();
 
-        return productRepository.findAll(example, pageRequest);
+        return new PageImpl<>(response, pageRequest, response.size());
     }
 
     @Override
-    public Page<Product> findByManufacturer(Manufacturer manufacturer, Pageable pageRequest) {
-        return productRepository.findByManufacturer(manufacturer, pageRequest);
+    public Page<Product> findByManufacturer(Long id, Pageable pageRequest) {
+        return productRepository.findAllByManufacturer_Id(id, pageRequest);
+    }
+
+    @Override
+    public Page<Product> findByCategory(Category category, Pageable pageRequest) {
+        return productRepository.findAllByCategories(category, pageRequest);
     }
 
     private Product getProduct(Long id) {

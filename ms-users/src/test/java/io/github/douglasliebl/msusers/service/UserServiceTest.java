@@ -174,46 +174,6 @@ class UserServiceTest {
         Mockito.verify(repository, Mockito.never()).delete(user);
     }
 
-    @Test
-    @DisplayName("Should get user details by email.")
-    public void getUserDetailsByEmailTest() {
-        // given
-        String email = "teste@email.com";
-        User user = getUser();
-
-        // when
-        Mockito.when(repository.findByEmail(Mockito.anyString()))
-                .thenReturn(Optional.ofNullable(user));
-
-        // then
-        UserDTO response = service.getDetailsByEmail(email);
-
-        assertThat(response.getId()).isEqualTo(user.getId());
-        assertThat(response.getEmail()).isEqualTo(user.getEmail());
-        assertThat(response.getFirstName()).isEqualTo(user.getFirstName());
-        assertThat(response.getLastName()).isEqualTo(user.getLastName());
-        assertThat(response.getCpf()).isEqualTo(user.getCpf());
-        assertThat(response.getRole()).isEqualTo(user.getRole().name());
-    }
-
-    @Test
-    @DisplayName("Should throw an exception trying to get an user not registered.")
-    public void getNotRegisteredUserTest() {
-        // given
-        String email = "teste@email.com";
-
-        // when
-        Mockito.when(repository.findByEmail(Mockito.anyString()))
-                .thenReturn(Optional.empty());
-
-        // then
-        Throwable exception = Assertions.catchThrowable(() -> service.getDetailsByEmail(email));
-
-        assertThat(exception)
-                .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessage("Account not found.");
-    }
-
     private static User getUser() {
         return User.builder()
                 .id(1L)

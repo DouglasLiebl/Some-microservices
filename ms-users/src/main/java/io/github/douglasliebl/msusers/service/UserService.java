@@ -22,5 +22,4 @@ public interface UserService {
 
     void banUser(String email);
 
-    UserDTO getDetailsByEmail(String email);
 }

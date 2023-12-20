@@ -1,13 +1,43 @@
 package io.github.douglasliebl.msproducts.resource;
 
-import com.netflix.infix.lang.infix.antlr.EventFilterParser;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.douglasliebl.msproducts.dto.ProductDTO;
+import io.github.douglasliebl.msproducts.dto.ProductInsertDTO;
+import io.github.douglasliebl.msproducts.dto.ProductUpdateDTO;
+import io.github.douglasliebl.msproducts.exception.ResourceNotFoundException;
+import io.github.douglasliebl.msproducts.model.entity.Category;
+import io.github.douglasliebl.msproducts.model.entity.Manufacturer;
+import io.github.douglasliebl.msproducts.model.entity.Product;
+import io.github.douglasliebl.msproducts.services.ProductService;
+import org.hamcrest.Matchers;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.BDDMockito;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.math.BigDecimal;
+import java.util.Collections;
+import java.util.Set;
+
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
@@ -267,13 +297,13 @@ class ProductControllerTest {
     @DisplayName("Should return paginated products.")
     public void returnPaginatedProductsTest() throws Exception {
         // given
-        Product product = Product.builder()
+        ProductDTO product = ProductDTO.builder()
                 .id(1L)
-                .manufacturer(new Manufacturer())
+                .manufacturerName(new Manufacturer().getName())
                 .build();
 
         BDDMockito.given(service.find(Mockito.anyString(), Mockito.any(Pageable.class)))
-                .willReturn(new PageImpl<Product>(Collections.singletonList(product), PageRequest.of(0, 10), 1));
+                .willReturn(new PageImpl<ProductDTO>(Collections.singletonList(product), PageRequest.of(0, 10), 1));
 
         String query = "?name=Product&page=0&size=10";
 
