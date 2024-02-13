@@ -7,6 +7,19 @@ spring:
         locator:
           enabled: true
           lower-case-service-id: true
+      routes:
+        - id: auth-server
+          uri: lb://auth-server
+          predicates:
+            - Path=/auth/**
+
+        - id: ms-product-admin
+          uri: lb://ms-products
+          predicates:
+            - Method=POST, PUT, DELETE
+            - Path=/product/**, /manufacturer/**, /category/**
+          filters:
+            - SuperUserFilter
 server:
   port: 8080
 
@@ -16,3 +29,4 @@ eureka:
     register-with-eureka: true
     service-url:
       defaultZone: http://localhost:8761/eureka
+

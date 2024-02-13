@@ -1,12 +1,9 @@
 package io.github.douglasliebl.authserver.dto;
 
 import io.github.douglasliebl.authserver.model.entity.User;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Data @Builder
+@Getter @Setter @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserDTO {
@@ -31,7 +28,6 @@ public class UserDTO {
                 .password(entity.getPassword())
                 .role(entity.getRole().name())
                 .createdAt(entity.getCreatedAt().toString())
-                .updatedAt(entity.getUpdatedAt().toString())
                 .build();
     }
 

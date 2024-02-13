@@ -1,6 +1,7 @@
 package io.github.douglasliebl.authserver.security;
 
 import io.github.douglasliebl.authserver.model.repositories.UserRepository;
+import io.github.douglasliebl.authserver.service.impl.TokenServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,7 +20,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class SecurityFilter extends OncePerRequestFilter {
 
-    private final TokenService tokenService;
+    private final TokenServiceImpl tokenService;
     private final UserRepository repository;
 
     @Override
@@ -30,7 +31,7 @@ public class SecurityFilter extends OncePerRequestFilter {
 
         if (token != null)  {
             var email = tokenService.validateToken(token);
-            UserDetails user = repository.findByEmail(email);
+            UserDetails user = (UserDetails) repository.findByEmail(email);
 
             if (user != null) {
                 var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());

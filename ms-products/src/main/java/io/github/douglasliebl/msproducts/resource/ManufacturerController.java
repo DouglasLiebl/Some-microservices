@@ -1,6 +1,5 @@
 package io.github.douglasliebl.msproducts.resource;
 
-import io.github.douglasliebl.msproducts.configuration.security.anotations.AdminPrivileges;
 import io.github.douglasliebl.msproducts.dto.ManufacturerDTO;
 import io.github.douglasliebl.msproducts.services.ManufacturerService;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +18,6 @@ public class ManufacturerController {
 
     private final ManufacturerService service;
 
-    @AdminPrivileges
     @PostMapping
     public ResponseEntity create(@RequestBody ManufacturerDTO request) {
         var response = service.registerManufacturer(request);
@@ -29,14 +27,12 @@ public class ManufacturerController {
         return ResponseEntity.created(uri).body(response);
     }
 
-    @AdminPrivileges
     @GetMapping(value = "/{id}")
     public ResponseEntity getManufacturerById(@PathVariable Long id) {
         var response = service.getManufacturerById(id);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @AdminPrivileges
     @DeleteMapping(value = "/{id}")
     public ResponseEntity deleteManufacturer(@PathVariable Long id) {
         var response = service.delete(id);
