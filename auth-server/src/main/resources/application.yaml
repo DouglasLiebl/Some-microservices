@@ -14,10 +14,6 @@ spring:
     password: root
     driver-class-name: org.postgresql.Driver
 
-  flyway:
-    baseline-on-migrate: true
-    enabled: true
-
 server:
   port: 8082
 
@@ -27,12 +23,3 @@ eureka:
       defaultZone: http://localhost:8761/eureka
   instance:
     instance-id: 8082
-
-io:
-  auth:
-    provider-uri: "http://localhost:8082"
-    jks:
-      keypass: 123456789
-      storepass: 123456789
-      alias: servicesJks
-      path: keystore/servicesJks.jks

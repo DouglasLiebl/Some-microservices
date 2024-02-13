@@ -1,6 +1,16 @@
 package io.github.douglasliebl.authserver.model.entity;
 
-public enum Role {
+import lombok.Getter;
 
-    ADMIN, CLIENT;
+@Getter
+public enum Role {
+    ADMIN("admin"),
+    USER("user");
+
+    private final String role;
+
+    Role(String role) {
+        this.role = role;
+    }
 }
+
