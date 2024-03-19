@@ -52,11 +52,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public PageImpl<ProductDTO> getProductsByCategory(Long id, Pageable pageRequest) {
-        List<ProductDTO> response = service.findByCategory(getById(id), pageRequest).stream()
-                .map(ProductDTO::of)
-                .toList();
-
-        return new PageImpl<>(response, pageRequest, response.size());
+       return service.findByCategory(getById(id), pageRequest);
     }
 
     @Override

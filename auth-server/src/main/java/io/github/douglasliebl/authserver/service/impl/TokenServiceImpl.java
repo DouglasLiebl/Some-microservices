@@ -81,7 +81,7 @@ public class TokenServiceImpl implements TokenService {
             return refreshTokenRepository
                     .save(refreshToken);
         } catch (Exception e) {
-            throw new DataIntegrityViolationException("Same user cannot have two Refresh Tokens. Please revoke or generate a new access toke from current Refresh Token.");
+            throw new DataIntegrityViolationException("Same user cannot have two Refresh Tokens. Please revoke or generate a new access token from current Refresh Token.");
         }
     }
 

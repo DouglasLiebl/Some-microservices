@@ -45,12 +45,7 @@ public class ManufacturerServiceImpl implements ManufacturerService {
 
     @Override
     public PageImpl<ProductDTO> getProductsByManufacturer(Long id, Pageable pageRequest) {
-        List<ProductDTO> response = productService
-                .findByManufacturer(id, pageRequest).stream()
-                .map(ProductDTO::of)
-                .toList();
-
-        return new PageImpl<>(response, pageRequest, response.size());
+        return productService.findByManufacturer(id, pageRequest);
     }
 
     private void uniqueVerifier(ManufacturerDTO request) {

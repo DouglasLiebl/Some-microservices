@@ -82,13 +82,19 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Page<Product> findByManufacturer(Long id, Pageable pageRequest) {
-        return productRepository.findAllByManufacturer_Id(id, pageRequest);
+    public PageImpl<ProductDTO> findByManufacturer(Long id, Pageable pageRequest) {
+        var response = productRepository.findAllByManufacturer_Id(id, pageRequest)
+                .map(ProductDTO::of).toList();
+
+        return new PageImpl<>(response, pageRequest, response.size());
     }
 
     @Override
-    public Page<Product> findByCategory(Category category, Pageable pageRequest) {
-        return productRepository.findAllByCategories(category, pageRequest);
+    public PageImpl<ProductDTO> findByCategory(Category category, Pageable pageRequest) {
+        var response = productRepository.findAllByCategories(category, pageRequest)
+                .map(ProductDTO::of).toList();
+
+        return new PageImpl<>(response, pageRequest, response.size());
     }
 
     private Product getProduct(Long id) {
