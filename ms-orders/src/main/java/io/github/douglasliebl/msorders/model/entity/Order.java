@@ -1,28 +1,25 @@
 package io.github.douglasliebl.msorders.model.entity;
 
-import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Set;
+import java.util.UUID;
 
 @Getter @Setter @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
-@Table(name = "tb_orders")
+@Document(collection = "Orders")
 public class Order {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private UUID id;
 
     private Long user_id;
     private Long address_id;
-
-    private Set<Long> products;
-
-    @Enumerated(EnumType.STRING)
+    private Set<Long> productsIds;
     private Status status;
-
+    private Address deliveryAddress;
 
 }
