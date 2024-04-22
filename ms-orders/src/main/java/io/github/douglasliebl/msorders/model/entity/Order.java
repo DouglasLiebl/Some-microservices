@@ -17,8 +17,7 @@ public class Order {
     private UUID id;
 
     private Long user_id;
-    private Long address_id;
-    private Set<Long> productsIds;
+    private Set<Product> products;
     private Status status;
     private Address deliveryAddress;
 

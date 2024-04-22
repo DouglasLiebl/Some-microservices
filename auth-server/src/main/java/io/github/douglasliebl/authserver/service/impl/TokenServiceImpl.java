@@ -71,13 +71,17 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public RefreshToken generateRefreshToken(String email) {
+        User user = userRepository.findByEmail(email);
         RefreshToken refreshToken = RefreshToken.builder()
-                .user(userRepository.findByEmail(email))
+                .user(user)
                 .refreshToken(UUID.randomUUID().toString())
                 .expiryDate(Instant.now().plusMillis(600000))
                 .build();
 
         try {
+            RefreshTokenDTO dto = RefreshTokenDTO.builder()
+                    .refreshToken(refreshTokenRepository.findByUserId(user.getId()).getRefreshToken()).build();
+            revokeRefreshToken(dto);
             return refreshTokenRepository
                     .save(refreshToken);
         } catch (Exception e) {

@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: ms-orders
+
+  data:
+    mongodb:
+      uri: mongodb://localhost/orders
+      database: Orders
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+server:
+  port: 0
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+
+
+mq:
+  configuration:
+    exchange: order-exchange
+    queue: product-verification
+    routing-key: product-verification
